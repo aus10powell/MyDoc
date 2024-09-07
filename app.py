@@ -2,6 +2,13 @@ import streamlit as st
 from huggingface_hub import hf_hub_download
 from llama_cpp import Llama
 
+# Initialize visitor count in session state if it doesn't exist
+if 'visitor_count' not in st.session_state:
+    st.session_state.visitor_count = 0
+
+# Increment visitor count
+st.session_state.visitor_count += 1
+
 @st.cache_resource
 def load_model():
     model_name = "aaditya/OpenBioLLM-Llama3-8B-GGUF"
@@ -12,6 +19,9 @@ def load_model():
 llm = load_model()
 
 st.title("OpenBioLLM Chat Interface")
+
+# Display visitor count
+st.sidebar.write(f"Visitor count: {st.session_state.visitor_count}")
 
 # Initialize chat history
 if "messages" not in st.session_state:
@@ -34,7 +44,7 @@ if question := st.chat_input("What is your medical question?"):
 
     # Generate response
     response = llm(prompt, max_tokens=4000)['choices'][0]['text']
-    
+
     # Display assistant response in chat message container
     with st.chat_message("assistant"):
         st.markdown(response)
